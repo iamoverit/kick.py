@@ -37,6 +37,7 @@ if TYPE_CHECKING:
         EditChatroomSettingsPayload,
         GetBannedUsersPayload,
         UnbanChatterPayload,
+        GetChannelPointsPayload
     )
     from .types.leaderboard import LeaderboardPayload
     from .types.message import (
@@ -51,6 +52,7 @@ if TYPE_CHECKING:
         ClientUserPayload,
         UserPayload,
         DestinationInfoPayload,
+        BroadcastingAuthPayload,
     )
     from .types.videos import GetVideosPayload
 
@@ -394,6 +396,18 @@ class HTTPClient:
 
         return self.request(Route("GET", f"/channels/{streamer}/bans"))
 
+    def get_channel_points(self, streamer: str) -> Response[GetChannelPointsPayload]:
+        return self.request(Route("GET", f"/channels/{streamer}/points"))
+
+    def post_channel_points(self, livestream_id: int):
+        return self.request(
+            Route("POST", f"/user/events"),
+            json=[{
+                "name": "tracking.user.watch.livestream",
+                "channel_id": livestream_id,
+            }],
+        )
+
     def unban_user(self, streamer: str, chatter: str) -> Response[UnbanChatterPayload]:
         return self.request(Route("DELETE", f"/channels/{streamer}/bans/{chatter}"))
 
@@ -545,6 +559,19 @@ class HTTPClient:
             "language": language,
             "is_mature": is_mature
         })
+
+    def broadcasting_auth(
+        self,
+        channel_name: str,
+        socket_id	: str,
+    ) -> Response[BroadcastingAuthPayload]:
+        return self.request(
+            Route.root("POST", f"/broadcasting/auth"),
+            json={
+                "channel_name": f"{channel_name}",
+                "socket_id": f"{socket_id}"
+            },
+        )
 
     async def get_asset(self, url: str) -> bytes:
         if self.__session is MISSING:

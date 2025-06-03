@@ -224,6 +224,28 @@ class Livestream(HTTPDataclass["LivestreamPayload"]):
 
         return [Category(data=c, http=self.http) for c in self._data["categories"]]
 
+    async def events_points(self) -> int:
+        """
+        |coro|
+
+        Fetches the user points for chatroom
+
+        Raises
+        -----------
+        NotFound
+            Streamer Not Found
+        HTTPException
+            Fetching the rules failed
+
+        Returns
+        -----------
+        str
+            The rules
+        """
+
+        data = await self.http.post_channel_points(self.channel_id)
+        return data
+
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and other.id == self.id
 

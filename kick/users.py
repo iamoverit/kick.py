@@ -162,6 +162,28 @@ class BaseUser:
         leaderboard.streamer = self
         return leaderboard
 
+    async def fetch_points(self) -> int:
+        """
+        |coro|
+
+        Fetches the user points for chatroom
+
+        Raises
+        -----------
+        NotFound
+            Streamer Not Found
+        HTTPException
+            Fetching the rules failed
+
+        Returns
+        -----------
+        str
+            The rules
+        """
+
+        data = await self.http.get_channel_points(self.username)
+        return data["data"]["points"]
+
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and other.id == self.id
 
@@ -207,7 +229,7 @@ class PartialUser(BaseUser):
         return User(data=data, http=self.http)
 
 
-class User:
+class User(BaseUser):
     """
     A dataclass which represents a User on kick
 
@@ -410,6 +432,16 @@ class User:
         """
 
         await self.http.ws.watch_channel(self.channel_id)
+        self.http.client._watched_users[self.channel_id] = self
+
+    async def start_watch_private(self, livestream_id) -> None:
+        """
+        |coro|
+
+        Watches a user to see if they go online.
+        """
+
+        await self.http.ws.watch_channel_private(livestream_id)
         self.http.client._watched_users[self.channel_id] = self
 
     async def stop_watching(self) -> None:

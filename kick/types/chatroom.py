@@ -113,3 +113,11 @@ class EditChatroomSettingsPayload(TypedDict):
     subscribers_mode: ChatroomSettingPayload
     followers_mode: FollowersModeStatusPayload
     emotes_mode: ChatroomSettingPayload
+
+class ChannelPointsPayload(TypedDict):
+    points: int
+    
+class GetChannelPointsPayload(TypedDict):
+    data: ChannelPointsPayload
+    message: str
+

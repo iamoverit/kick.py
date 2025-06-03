@@ -153,3 +153,6 @@ class ClientUserPayload(TypedDict):
 class DestinationInfoPayload(TypedDict):
     rtmp_publish_path: str
     rtmp_stream_token: str
+
+class BroadcastingAuthPayload(TypedDict):
+    auth: str
